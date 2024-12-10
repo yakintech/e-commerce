@@ -6,6 +6,7 @@ const cors = require('cors');
 const multer = require('multer');
 
 
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 
@@ -39,17 +40,16 @@ app.get("/products", (req, res) => {
 
 
 
-//upload to azure blob POST request
 app.post("/upload",upload.array("files", 10), async (req, res) => {
     try {
-        const file = req.files.file;
         const folder = req.body.folder;
-        const blobName = await uploadToAzureBlob(folder, file);
-        if (blobName) {
-            return res.json({ success: true, blobName });
-        } else {
-            return res.json({ success: false });
+        
+        for (let i = 0; i < req.files.length; i++) {
+            const file = req.files[i];
+            const blobName = await uploadToAzureBlob(folder, file);
+            console.log(blobName);
         }
+        return res.json({ success: true });
     } catch (error) {
         console.log("Error uploading to Azure Blob", error);
         return res.json({ success: false });
